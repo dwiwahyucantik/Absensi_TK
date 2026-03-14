@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Absensi Digital TK - Sky Blue Edition</title>
+    <title>Sistem Absensi Digital TK</title>
     <!-- CSS Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -15,72 +15,59 @@
     <style>
         :root {
             --primary-blue: #0ea5e9;
-            --secondary-blue: #bae6fd;
             --bg-sky: #f0f9ff;
             --dark-blue: #0369a1;
         }
         body {
             background-color: var(--bg-sky);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             color: #334155;
+            overflow-x: hidden;
         }
+        /* Mobile Sidebar & Toggle */
         .sidebar {
             background: white;
             min-height: 100vh;
-            box-shadow: 4px 0 15px rgba(14, 165, 233, 0.1);
-            border-right: 1px solid var(--secondary-blue);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                width: 250px;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                width: 100vw; height: 100vh;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+            }
+            .overlay.active { display: block; }
         }
         .nav-link {
-            color: #64748b;
-            padding: 12px 20px;
-            border-radius: 12px;
-            margin: 4px 15px;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            color: #64748b; padding: 12px 20px; border-radius: 12px;
+            margin: 4px 15px; cursor: pointer;
         }
         .nav-link.active {
-            background: var(--primary-blue);
-            color: white !important;
-            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+            background: var(--primary-blue); color: white !important;
         }
-        .nav-link:hover:not(.active) {
-            background: var(--bg-sky);
-            color: var(--primary-blue);
-        }
-        .card {
-            border: none;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(14, 165, 233, 0.05);
-            background: white;
-        }
-        .stat-card {
-            border-bottom: 4px solid var(--primary-blue);
-        }
-        .btn-primary {
-            background-color: var(--primary-blue);
-            border: none;
-            border-radius: 10px;
-        }
-        #main-content {
-            padding: 30px;
-        }
+        .card { border: none; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .loading-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255,255,255,0.8);
-            display: none; justify-content: center; align-items: center;
-            z-index: 9999;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8); display: none;
+            justify-content: center; align-items: center; z-index: 9999;
         }
-        .table-laporan-wrapper {
-            overflow-x: auto;
-            background: white;
-            border-radius: 10px;
-            padding: 10px;
+        #login-page {
+            height: 100vh; display: flex; align-items: center; justify-content: center;
         }
+        .table-laporan-wrapper { overflow-x: auto; background: white; padding: 15px; border-radius: 15px; }
         #table-laporan-preview th, #table-laporan-preview td {
-            border: 1px solid #cbd5e1;
-            padding: 4px;
-            text-align: center;
+            border: 1px solid #dee2e6; padding: 5px; text-align: center; font-size: 12px;
         }
     </style>
 </head>
@@ -90,129 +77,190 @@
     <div class="spinner-border text-primary" role="status"></div>
 </div>
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse px-0">
-            <div class="p-4 text-center">
-                <i class="fas fa-child-rearing fa-3x text-primary mb-2"></i>
-                <h4 class="fw-bold text-primary">Absen-TK</h4>
-            </div>
-            <ul class="nav flex-column">
-                <li class="nav-item"><a class="nav-link active" onclick="switchPage('home')"><i class="fas fa-chart-line me-2"></i> Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="switchPage('kelas')"><i class="fas fa-school me-2"></i> Data Kelas</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="switchPage('siswa')"><i class="fas fa-user-graduate me-2"></i> Data Siswa</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="switchPage('absen')"><i class="fas fa-edit me-2"></i> Input Absen</a></li>
-                <li class="nav-item"><a class="nav-link" onclick="switchPage('laporan')"><i class="fas fa-file-export me-2"></i> Cetak Laporan</a></li>
-            </ul>
-        </nav>
+<!-- Login Section -->
+<div id="login-page">
+    <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
+        <div class="text-center mb-4">
+            <i class="fas fa-child-rearing fa-3x text-primary"></i>
+            <h3 class="mt-2 fw-bold">Login Absensi</h3>
+        </div>
+        <div class="mb-3">
+            <label>Username</label>
+            <input type="text" id="login-user" class="form-control" placeholder="Masukkan username">
+        </div>
+        <div class="mb-3">
+            <label>Password</label>
+            <input type="password" id="login-pass" class="form-control" placeholder="Masukkan password">
+        </div>
+        <button class="btn btn-primary w-100 py-2" onclick="handleLogin()">Masuk</button>
+        <div class="mt-3 text-center small text-muted">Akses Terbatas untuk Staff</div>
+    </div>
+</div>
 
-        <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4" id="main-content">
-            <div id="content-area">
-                
-                <!-- Home -->
-                <div id="page-home">
-                    <h2 class="mb-4">Ringkasan Kehadiran</h2>
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-3"><div class="card p-3 stat-card text-center"><h6>Hadir</h6><h2 id="stat-hadir" class="text-success">0</h2></div></div>
-                        <div class="col-md-3"><div class="card p-3 stat-card text-center" style="border-color:#fbbf24"><h6>Izin/Sakit</h6><h2 id="stat-izin" class="text-warning">0</h2></div></div>
-                        <div class="col-md-3"><div class="card p-3 stat-card text-center" style="border-color:#ef4444"><h6>Alpha</h6><h2 id="stat-alpha" class="text-danger">0</h2></div></div>
-                        <div class="col-md-3"><div class="card p-3 stat-card text-center"><h6>Total Siswa</h6><h2 id="stat-total" class="text-primary">0</h2></div></div>
-                    </div>
-                    <div class="row g-4">
-                        <div class="col-lg-8"><div class="card p-4"><h5>Tren Kehadiran Bulanan</h5><canvas id="barChart"></canvas></div></div>
-                        <div class="col-lg-4"><div class="card p-4"><h5>Status Hari Ini</h5><canvas id="pieChart"></canvas></div></div>
-                    </div>
+<!-- App Section (Hidden by default) -->
+<div id="app-container" style="display: none;">
+    <div class="overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar shadow-sm px-0" id="sidebar">
+                <div class="p-4 text-center">
+                    <h4 class="fw-bold text-primary">Absen-TK</h4>
+                </div>
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="nav-link active" onclick="switchPage('home')"><i class="fas fa-home me-2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" onclick="switchPage('kelas')"><i class="fas fa-school me-2"></i> Kelas</a></li>
+                    <li class="nav-item"><a class="nav-link" onclick="switchPage('siswa')"><i class="fas fa-user-graduate me-2"></i> Siswa</a></li>
+                    <li class="nav-item"><a class="nav-link" onclick="switchPage('absen')"><i class="fas fa-calendar-check me-2"></i> Absensi</a></li>
+                    <li class="nav-item"><a class="nav-link" onclick="switchPage('laporan')"><i class="fas fa-file-pdf me-2"></i> Laporan</a></li>
+                    <li class="nav-item mt-4"><a class="nav-link text-danger" onclick="handleLogout()"><i class="fas fa-sign-out-alt me-2"></i> Keluar</a></li>
+                </ul>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <!-- Header Mobile -->
+                <div class="d-md-none py-3 d-flex align-items-center">
+                    <button class="btn btn-light" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                    <h5 class="ms-3 mb-0 fw-bold">Absensi TK</h5>
                 </div>
 
-                <!-- Page Kelas -->
-                <div id="page-kelas" style="display:none;">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Manajemen Kelas</h2>
-                        <button class="btn btn-primary" onclick="showModalKelas()"><i class="fas fa-plus"></i> Tambah Kelas</button>
-                    </div>
-                    <div class="card p-3"><table class="table" id="table-kelas"><thead><tr><th>ID</th><th>Kelas</th><th>Guru</th><th>KS</th><th>Aksi</th></tr></thead><tbody></tbody></table></div>
-                </div>
-
-                <!-- Page Siswa -->
-                <div id="page-siswa" style="display:none;">
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h2>Data Peserta Didik</h2>
-                        <button class="btn btn-primary" onclick="showModalSiswa()"><i class="fas fa-plus"></i> Tambah Siswa</button>
-                    </div>
-                    <div class="card p-3"><table class="table" id="table-siswa"><thead><tr><th>NISN</th><th>Nama</th><th>Kelas</th><th>Aksi</th></tr></thead><tbody></tbody></table></div>
-                </div>
-
-                <!-- Page Absen -->
-                <div id="page-absen" style="display:none;">
-                    <h2>Input Kehadiran</h2>
-                    <div class="card p-4">
+                <div id="content-area" class="py-4">
+                    <!-- Dashboard -->
+                    <div id="page-home">
+                        <h3 class="mb-4">Dashboard</h3>
                         <div class="row g-3 mb-4">
-                            <div class="col-md-6"><label>Kelas</label><select id="absen-kelas" class="form-select" onchange="loadSiswaForAbsen()"></select></div>
-                            <div class="col-md-6"><label>Tanggal</label><input type="date" id="absen-tanggal" class="form-control"></div>
+                            <div class="col-6 col-md-3"><div class="card p-3 text-center"><small>Hadir</small><h2 id="stat-hadir" class="text-success">0</h2></div></div>
+                            <div class="col-6 col-md-3"><div class="card p-3 text-center"><small>Izin/Sakit</small><h2 id="stat-izin" class="text-warning">0</h2></div></div>
+                            <div class="col-6 col-md-3"><div class="card p-3 text-center"><small>Alpa</small><h2 id="stat-alpha" class="text-danger">0</h2></div></div>
+                            <div class="col-6 col-md-3"><div class="card p-3 text-center"><small>Total Siswa</small><h2 id="stat-total" class="text-primary">0</h2></div></div>
                         </div>
-                        <div id="list-siswa-absen" class="table-responsive"></div>
-                        <button class="btn btn-primary w-100 mt-3" id="btn-save-absen" style="display:none;" onclick="submitAbsensi()">Simpan Absensi</button>
+                        <div class="row g-4">
+                            <div class="col-md-8"><div class="card p-4"><h5>Grafik Bulanan</h5><canvas id="barChart"></canvas></div></div>
+                            <div class="col-md-4"><div class="card p-4"><h5>Status Hari Ini</h5><canvas id="pieChart"></canvas></div></div>
+                        </div>
                     </div>
-                </div>
 
-                <!-- Page Laporan -->
-                <div id="page-laporan" style="display:none;">
-                    <h2>Laporan Bulanan</h2>
-                    <div class="card p-4 mb-4">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-4"><label>Kelas</label><select id="lap-kelas" class="form-select"></select></div>
-                            <div class="col-md-4"><label>Bulan</label><input type="month" id="lap-bulan" class="form-control"></div>
-                            <div class="col-md-4">
-                                <button class="btn btn-primary w-100 mb-2" onclick="loadLaporan()">Tampilkan Data</button>
-                                <button class="btn btn-danger w-100" onclick="generateReportPDF()">Download PDF</button>
+                    <!-- Page Kelas -->
+                    <div id="page-kelas" style="display:none;">
+                        <div class="d-flex justify-content-between mb-4">
+                            <h3>Data Kelas</h3>
+                            <button class="btn btn-primary btn-sm" onclick="showModalKelas()"><i class="fas fa-plus"></i> Tambah</button>
+                        </div>
+                        <div class="card p-3 table-responsive"><table class="table table-hover" id="table-kelas"><thead><tr><th>ID</th><th>Nama Kelas</th><th>Guru</th><th>Aksi</th></tr></thead><tbody></tbody></table></div>
+                    </div>
+
+                    <!-- Page Siswa -->
+                    <div id="page-siswa" style="display:none;">
+                        <div class="d-flex justify-content-between mb-4">
+                            <h3>Data Siswa</h3>
+                            <button class="btn btn-primary btn-sm" onclick="showModalSiswa()"><i class="fas fa-plus"></i> Tambah</button>
+                        </div>
+                        <div class="card p-3 table-responsive"><table class="table table-hover" id="table-siswa"><thead><tr><th>NISN</th><th>Nama</th><th>Kelas</th><th>Aksi</th></tr></thead><tbody></tbody></table></div>
+                    </div>
+
+                    <!-- Page Absen -->
+                    <div id="page-absen" style="display:none;">
+                        <h3>Input Kehadiran</h3>
+                        <div class="card p-4">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6"><label>Pilih Kelas</label><select id="absen-kelas" class="form-select" onchange="loadSiswaForAbsen()"></select></div>
+                                <div class="col-md-6"><label>Tanggal</label><input type="date" id="absen-tanggal" class="form-control"></div>
                             </div>
+                            <div id="list-siswa-absen"></div>
+                            <button class="btn btn-primary w-100 mt-3" id="btn-save-absen" style="display:none;" onclick="submitAbsensi()">Simpan Kehadiran</button>
                         </div>
                     </div>
-                    <div class="table-laporan-wrapper">
-                        <table id="table-laporan-preview" style="min-width: 1200px;"></table>
+
+                    <!-- Page Laporan -->
+                    <div id="page-laporan" style="display:none;">
+                        <h3>Laporan</h3>
+                        <div class="card p-4 mb-4">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-4"><label>Kelas</label><select id="lap-kelas" class="form-select"></select></div>
+                                <div class="col-md-4"><label>Bulan</label><input type="month" id="lap-bulan" class="form-control"></div>
+                                <div class="col-md-4"><button class="btn btn-primary w-100" onclick="loadLaporan()">Cari Data</button></div>
+                            </div>
+                            <button class="btn btn-danger w-100 mt-2" onclick="generateReportPDF()"><i class="fas fa-file-pdf"></i> Download PDF</button>
+                        </div>
+                        <div class="table-laporan-wrapper"><table id="table-laporan-preview"></table></div>
                     </div>
                 </div>
-
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbySafKz5DRe3U8Z5--ARhRlCqpbU5TeZgrf8Topdnorayf4Qdzle_-YUF_4SZE2ZGVKag/exec"; 
+    // --- KONFIGURASI ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbxY8JWCObI-hhVw86BaJPA1EDPSN7lNKfaRuamG67li-_uMdXTDSJVpcqzUm-atMw6tYQ/exec"; 
 
     let globalData = { kelas: [], siswa: [], charts: {} };
 
     function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
+    function toggleSidebar() { 
+        document.getElementById('sidebar').classList.toggle('active'); 
+        document.getElementById('sidebarOverlay').classList.toggle('active');
+    }
 
     async function callAPI(action, data = {}) {
         if (API_URL.includes("URL_WEB_APP")) {
-            Swal.fire('Info', 'Masukkan URL Apps Script di kode index.html baris 154.', 'info');
+            Swal.fire('Error', 'Masukkan URL Apps Script di kode index.html!', 'error');
             return { error: true };
         }
         showLoader(true);
         try {
-            const resp = await fetch(`${API_URL}?action=${action}`, { method: 'POST', body: JSON.stringify(data) });
+            const resp = await fetch(`${API_URL}?action=${action}`, { 
+                method: 'POST', 
+                body: JSON.stringify(data) 
+            });
             const res = await resp.json();
             showLoader(false);
             return res;
         } catch (e) {
             showLoader(false);
+            console.error(e);
             return { error: true };
         }
     }
 
+    // --- AUTH ---
+    async function handleLogin() {
+        const user = document.getElementById('login-user').value;
+        const pass = document.getElementById('login-pass').value;
+        if(!user || !pass) return Swal.fire('Error', 'Lengkapi Username & Password', 'error');
+
+        const res = await callAPI('login', { user, pass });
+        if(res.success) {
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('username', user);
+            showApp();
+        } else {
+            Swal.fire('Gagal', 'Username atau Password salah!', 'error');
+        }
+    }
+
+    function handleLogout() {
+        localStorage.clear();
+        location.reload();
+    }
+
+    function showApp() {
+        document.getElementById('login-page').style.display = 'none';
+        document.getElementById('app-container').style.display = 'block';
+        initDashboard();
+    }
+
+    // --- NAVIGATION ---
     function switchPage(pageId) {
         document.querySelectorAll('#content-area > div').forEach(d => d.style.display = 'none');
         document.getElementById('page-' + pageId).style.display = 'block';
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         
-        // Handling active class via event or manual trigger
-        if(event && event.currentTarget) {
-            event.currentTarget.classList.add('active');
-        }
+        const activeLink = Array.from(document.querySelectorAll('.nav-link')).find(l => l.innerText.toLowerCase().includes(pageId));
+        if(activeLink) activeLink.classList.add('active');
+        
+        if(window.innerWidth < 768) toggleSidebar();
 
         if(pageId === 'home') initDashboard();
         if(pageId === 'kelas') fetchKelas();
@@ -221,7 +269,7 @@
         if(pageId === 'laporan') fetchKelas();
     }
 
-    // --- CRUD OPS ---
+    // --- LOGIC DASHBOARD ---
     async function initDashboard() {
         const data = await callAPI('getDashboard');
         if(!data.error) {
@@ -236,9 +284,9 @@
     function renderCharts(data) {
         if(globalData.charts.bar) globalData.charts.bar.destroy();
         if(globalData.charts.pie) globalData.charts.pie.destroy();
-        const bCtx = document.getElementById('barChart');
-        const pCtx = document.getElementById('pieChart');
-        if(!bCtx || !pCtx) return;
+        
+        const bCtx = document.getElementById('barChart').getContext('2d');
+        const pCtx = document.getElementById('pieChart').getContext('2d');
 
         globalData.charts.bar = new Chart(bCtx, {
             type: 'bar', data: { labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'],
@@ -251,37 +299,17 @@
         });
     }
 
+    // --- KELAS & SISWA ---
     async function fetchKelas() {
         const res = await callAPI('getKelas');
         if(!res.error) {
             globalData.kelas = res;
             document.querySelector('#table-kelas tbody').innerHTML = res.map(k => `
-                <tr><td>${k.ID_Kelas}</td><td>${k.Nama_Kelas}</td><td>${k.Nama_Guru}</td><td>${k.Nama_KS}</td>
+                <tr><td>${k.ID_Kelas}</td><td>${k.Nama_Kelas}</td><td>${k.Nama_Guru}</td>
                 <td><button class="btn btn-sm btn-danger" onclick="deleteData('Kelas','${k.ID_Kelas}')"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+            
             const opts = '<option value="">-- Pilih --</option>' + res.map(k => `<option value="${k.ID_Kelas}">${k.Nama_Kelas}</option>`).join('');
-            document.getElementById('absen-kelas').innerHTML = opts;
-            document.getElementById('lap-kelas').innerHTML = opts;
-        }
-    }
-
-    async function showModalKelas() {
-        const { value: form } = await Swal.fire({
-            title: 'Tambah Kelas',
-            html: `<input id="f-id" class="swal2-input" placeholder="ID Kelas (Contoh: TKA1)">
-                   <input id="f-nama" class="swal2-input" placeholder="Nama Kelas (Contoh: TK A - Matahari)">
-                   <input id="f-guru" class="swal2-input" placeholder="Nama Guru">
-                   <input id="f-ks" class="swal2-input" placeholder="Nama Kepala Sekolah">`,
-            focusConfirm: false,
-            preConfirm: () => {
-                const ID = document.getElementById('f-id').value;
-                const Nama = document.getElementById('f-nama').value;
-                if(!ID || !Nama) return Swal.showValidationMessage('ID dan Nama harus diisi');
-                return { ID_Kelas: ID, Nama_Kelas: Nama, Nama_Guru: document.getElementById('f-guru').value, Nama_KS: document.getElementById('f-ks').value };
-            }
-        });
-        if(form) {
-            await callAPI('addKelas', form);
-            fetchKelas();
+            ['absen-kelas', 'lap-kelas'].forEach(id => { if(document.getElementById(id)) document.getElementById(id).innerHTML = opts; });
         }
     }
 
@@ -295,52 +323,54 @@
         }
     }
 
+    async function showModalKelas() {
+        const { value: form } = await Swal.fire({
+            title: 'Tambah Kelas',
+            html: `<input id="f-id" class="swal2-input" placeholder="ID Kelas">
+                   <input id="f-nama" class="swal2-input" placeholder="Nama Kelas">
+                   <input id="f-guru" class="swal2-input" placeholder="Nama Guru">
+                   <input id="f-ks" class="swal2-input" placeholder="Nama Kepala Sekolah">`,
+            preConfirm: () => ({ ID_Kelas: document.getElementById('f-id').value, Nama_Kelas: document.getElementById('f-nama').value, Nama_Guru: document.getElementById('f-guru').value, Nama_KS: document.getElementById('f-ks').value })
+        });
+        if(form && form.ID_Kelas) { await callAPI('addKelas', form); fetchKelas(); }
+    }
+
     async function showModalSiswa() {
-        if(globalData.kelas.length === 0) return Swal.fire('Error', 'Buat Data Kelas dulu!', 'warning');
+        if(globalData.kelas.length === 0) return Swal.fire('Error','Buat data kelas dulu','warning');
         const opts = globalData.kelas.map(k => `<option value="${k.ID_Kelas}">${k.Nama_Kelas}</option>`).join('');
         const { value: form } = await Swal.fire({
             title: 'Tambah Siswa',
             html: `<input id="f-nisn" class="swal2-input" placeholder="NISN">
                    <input id="f-nama" class="swal2-input" placeholder="Nama Siswa">
                    <select id="f-kls" class="swal2-input">${opts}</select>`,
-            preConfirm: () => {
-                const NISN = document.getElementById('f-nisn').value;
-                const Nama = document.getElementById('f-nama').value;
-                if(!NISN || !Nama) return Swal.showValidationMessage('NISN dan Nama harus diisi');
-                return { NISN: NISN, Nama_Siswa: Nama, ID_Kelas: document.getElementById('f-kls').value };
-            }
+            preConfirm: () => ({ NISN: document.getElementById('f-nisn').value, Nama_Siswa: document.getElementById('f-nama').value, ID_Kelas: document.getElementById('f-kls').value })
         });
-        if(form) {
-            await callAPI('addSiswa', form);
-            fetchSiswa();
-        }
+        if(form && form.NISN) { await callAPI('addSiswa', form); fetchSiswa(); }
     }
 
     async function deleteData(type, id) {
-        const confirm = await Swal.fire({ title: 'Hapus data?', showCancelButton: true });
-        if(confirm.isConfirmed) {
-            await callAPI('deleteData', { type, id });
-            if(type === 'Kelas') fetchKelas(); else fetchSiswa();
+        const res = await Swal.fire({ title: 'Yakin hapus?', text: "Data tidak bisa dikembalikan!", icon: 'warning', showCancelButton: true });
+        if(res.isConfirmed) {
+            const result = await callAPI('deleteData', { type, id });
+            if(result.success) {
+                Swal.fire('Terhapus!', '', 'success');
+                type === 'Kelas' ? fetchKelas() : fetchSiswa();
+            } else {
+                Swal.fire('Gagal', 'Terjadi kesalahan saat menghapus', 'error');
+            }
         }
     }
 
-    // --- ABSENSI ---
+    // --- ABSENSI & LAPORAN ---
     function loadSiswaForAbsen() {
         const idKls = document.getElementById('absen-kelas').value;
         const filtered = globalData.siswa.filter(s => s.ID_Kelas === idKls);
         const container = document.getElementById('list-siswa-absen');
-        if(filtered.length === 0) { 
-            container.innerHTML = "Tidak ada siswa di kelas ini."; 
-            document.getElementById('btn-save-absen').style.display = 'none';
-            return; 
-        }
+        if(filtered.length === 0) { container.innerHTML = "Pilih kelas yang berisi siswa."; document.getElementById('btn-save-absen').style.display = 'none'; return; }
+        
         let h = '<table class="table"><thead><tr><th>Nama</th><th>Status</th></tr></thead><tbody>';
         filtered.forEach(s => {
-            h += `<tr><td>${s.Nama_Siswa}</td><td>
-                <select class="form-select sel-stat" data-nisn="${s.NISN}">
-                    <option value="H">Hadir</option><option value="S">Sakit</option>
-                    <option value="I">Izin</option><option value="A">Alpha</option>
-                </select></td></tr>`;
+            h += `<tr><td>${s.Nama_Siswa}</td><td><select class="form-select sel-stat" data-nisn="${s.NISN}"><option value="H">Hadir</option><option value="S">Sakit</option><option value="I">Izin</option><option value="A">Alpha</option></select></td></tr>`;
         });
         container.innerHTML = h + '</tbody></table>';
         document.getElementById('btn-save-absen').style.display = 'block';
@@ -349,12 +379,11 @@
     async function submitAbsensi() {
         const tgl = document.getElementById('absen-tanggal').value;
         if(!tgl) return Swal.fire('Pilih Tanggal');
-        const records = Array.from(document.querySelectorAll('.sel-stat')).map(s => ({ nisn: s.dataset.nisn, status: s.value, keterangan: '' }));
+        const records = Array.from(document.querySelectorAll('.sel-stat')).map(s => ({ nisn: s.dataset.nisn, status: s.value }));
         const res = await callAPI('submitAbsensi', { tanggal: tgl, records });
-        if(!res.error) Swal.fire('Berhasil','Data kehadiran disimpan','success');
+        if(res.success) Swal.fire('Berhasil','','success');
     }
 
-    // --- LAPORAN ---
     async function loadLaporan() {
         const bt = document.getElementById('lap-bulan').value;
         const idKls = document.getElementById('lap-kelas').value;
@@ -364,7 +393,7 @@
         const data = await callAPI('getLaporan', { bulan: bln, tahun: thn, idKelas: idKls });
         const siswa = globalData.siswa.filter(s => s.ID_Kelas === idKls);
 
-        let h = `<thead><tr><th rowspan="2">NO</th><th rowspan="2">NIS</th><th rowspan="2">NAMA SISWA</th><th colspan="${days}">TANGGAL</th><th colspan="4">KET</th></tr><tr>`;
+        let h = `<thead><tr><th rowspan="2">NO</th><th rowspan="2">NIS</th><th rowspan="2">NAMA</th><th colspan="${days}">TANGGAL</th><th colspan="4">REKAP</th></tr><tr>`;
         for(let i=1; i<=days; i++) h += `<th>${i}</th>`;
         h += `<th>H</th><th>S</th><th>I</th><th>A</th></tr></thead><tbody>`;
 
@@ -387,39 +416,14 @@
     function generateReportPDF() {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('l', 'mm', 'a4');
-        const bt = document.getElementById('lap-bulan').value;
-        const idKls = document.getElementById('lap-kelas').value;
-        const kls = globalData.kelas.find(k => k.ID_Kelas === idKls) || {};
-
-        doc.setFontSize(14);
-        doc.text("ABSENSI SISWA", 148, 15, { align: 'center' });
-        doc.setFontSize(10);
-        doc.text(`BULAN: ${bt} | KELAS: ${kls.Nama_Kelas || '-'}`, 148, 22, { align: 'center' });
-
-        doc.autoTable({ 
-            html: '#table-laporan-preview', 
-            startY: 30, 
-            theme: 'grid',
-            styles: { fontSize: 5, cellPadding: 1, halign: 'center' },
-            headStyles: { fillColor: [240, 240, 240], textColor: 0 },
-            columnStyles: { 2: { halign: 'left' } }
-        });
-
-        const finalY = doc.lastAutoTable.finalY + 15;
-        doc.text("Mengetahui,", 30, finalY);
-        doc.text("Kepala Sekolah,", 30, finalY + 5);
-        doc.text(`( ${kls.Nama_KS || '....................'} )`, 30, finalY + 25);
-
-        doc.text("Guru Kelas,", 230, finalY + 5);
-        doc.text(`( ${kls.Nama_Guru || '....................'} )`, 230, finalY + 25);
-
-        doc.save(`Absensi_${bt}.pdf`);
+        doc.text("LAPORAN ABSENSI TK", 148, 15, { align: 'center' });
+        doc.autoTable({ html: '#table-laporan-preview', startY: 25, styles: { fontSize: 5 } });
+        doc.save("Laporan-Absensi.pdf");
     }
 
     window.onload = () => {
+        if(localStorage.getItem('isLoggedIn') === 'true') showApp();
         document.getElementById('absen-tanggal').valueAsDate = new Date();
-        document.getElementById('lap-bulan').value = new Date().toISOString().substring(0, 7);
-        initDashboard();
     };
 </script>
 </body>
